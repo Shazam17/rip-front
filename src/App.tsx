@@ -1,9 +1,6 @@
 import React, {Component, CSSProperties, useState} from 'react';
 import plus from './plus.png';
 import close from './close.png';
-import like from './like.png';
-import success from './success.png';
-import trash from './trash.png';
 import Modal from 'react-modal';
 import fetchRequest from "./fetchRequest";
 
@@ -20,16 +17,18 @@ export enum WSEventes {
 
 const styles= {
   taskStyle: {
-    width: '220px',
+    width: '400px',
     height: '220px',
     display:'flex',
     borderRadius: '25px',
     flexDirection: 'column',
     alignItems:'center',
-    backgroundColor: '#b7c6b3',
-    color: '#123123',
+    backgroundColor: 'grey',
+    color: 'black',
     fontWeight: '500',
-    fontSize: '18px'
+    fontSize: '18px',
+    margin: '0 auto',
+    marginBottom: '35px'
   },
   textStyle: {
     color: '#77c3a1',
@@ -52,13 +51,14 @@ const styles= {
     cursor: 'pointer',
     padding:'12px',
     borderRadius: '25px',
-    backgroundColor: '#4c563d',
+    backgroundColor: 'black',
     marginLeft: '25px'
   },
   button: {
     fontWeight: '500',
-    color: '#34c384',
-    backgroundColor: '#123123',
+    color: 'green',
+    fontSize: '15px',
+    backgroundColor: 'black',
     width: '100px',
     height: '30px',
     borderRadius: '12px',
@@ -109,23 +109,16 @@ class Task extends Component<any, any> {
     const {label, body, done, id} = this.props.task;
     return (<div style={styles.taskStyle as CSSProperties}>
       <div>
-        <img src={trash} style={{width: '25px', height: '25px', position: 'relative', left: -80, top: 10}}
-             onClick={() => {
-               this.props.removeTask(id)
-             }}/>
-        <img src={done ? close :success} style={{width: '25px', height: '25px', position: 'relative', right: -80, top: 10}}
-             onClick={() => {
-               this.props.markDone(id)
-             }}/>
+        <button onClick={() => {
+            this.props.removeTask(id)
+          }}>Удалить задачу</button>
+
+        <button   onClick={() => {
+          this.props.markDone(id)
+        }}>{done ? "отметить не сделанной" : "отметить сделанной"}</button>
       </div>
       <p>{label}</p>
       <p>{body}</p>
-      <img src={like} style={{
-        transform: done ? '' : 'rotateX(180deg)',
-        width: '25px', height: '25px'}}
-           onClick={() => {
-
-           }}/>
       <p>{done ? 'Сделано' : 'Не сделано'}</p>
     </div>);
   }
@@ -186,24 +179,18 @@ class TaskList extends Component<any, State> {
     })
   }
 
-  editTask(){
-
-  }
-
   state: State = {
     tasks : [],
     isCreateTaskModelOpen: false
   }
 
   componentDidMount() {
-
     socket.on(WSEventes.CREATE_TASK, (res) => {
       this.setState({
         tasks: [res, ...this.state.tasks],
         isCreateTaskModelOpen: false
       })
     })
-
     this.getAllTasks().then((tasks) => {
       console.log(tasks)
       this.setState({
@@ -244,9 +231,9 @@ class TaskList extends Component<any, State> {
   }
 
   render() {
-    return <div style={{ backgroundColor: '#4a5351', height:'100%'}}>
+    return <div style={{  height:'100%'}}>
       {this.createModal()}
-      <div style={{padding:'5px', width: '100%', height: '55px', backgroundColor: '#1c1c16',display: 'flex', alignItems:'center'}}>
+      <div style={{padding:'5px', width: '100%', height: '55px', backgroundColor: 'grey',display: 'flex', alignItems:'center'}}>
         <div style={styles.textStyle as CSSProperties}>Список задач</div>
         <div style={styles.addButton as CSSProperties} onClick={() => {
           this.setState({
@@ -259,11 +246,8 @@ class TaskList extends Component<any, State> {
 
       </div>
       <div style={{padding: '20px',
-        display: 'grid',
-        gridAutoColumns: '1fr',
-        gridAutoRows: '1fr',
-        gridTemplateColumns: '1fr 1fr 1fr 1fr',
-        gap: '10px 10px',
+
+
       }}>
         {this.state.tasks.map((item: any) => <Task task={item} removeTask={this.removeTask.bind(this)} markDone={this.markDone.bind(this)}/>)}
       </div>
